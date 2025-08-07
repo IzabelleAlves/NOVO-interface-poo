@@ -17,7 +17,7 @@ public class ClinicaFacade {
         this.exameDAO = new ExameDAO(dbConnection);
     }
 
-    // --- MÉTODOS PACIENTE ---
+
     public void salvarPaciente(Paciente paciente) throws Exception {
         if (paciente.getId() == null || paciente.getId() == 0) {
             pacienteDAO.create(paciente);
@@ -47,7 +47,6 @@ public class ClinicaFacade {
         return pacienteDAO.findAll();
     }
 
-    // --- MÉTODOS EXAME ---
     public void salvarExame(Exame exame) throws Exception {
          if (exame.getId() == null || exame.getId() == 0) {
             exameDAO.create(exame);
@@ -65,25 +64,13 @@ public class ClinicaFacade {
     }
     
     public void deletarExame(long exameId) throws Exception {
-        // 1. Cria um objeto Exame temporário.
         Exame exameParaDeletar = new Exame();
-        
-        // 2. Define o ID neste objeto.
+
         exameParaDeletar.setId(exameId);
         
-        // 3. Passa o OBJETO para o método delete do DAO, como ele espera.
         exameDAO.delete(exameParaDeletar);
     }
-    
- // Dentro da classe ClinicaFacade
 
-    /**
-     * Busca pacientes por um termo e critério, e enriquece os resultados com a contagem de exames.
-     * @param termo O texto a ser buscado.
-     * @param criterio A coluna onde buscar ("nome" ou "cpf").
-     * @return Uma lista de pacientes filtrada.
-     * @throws Exception se ocorrer um erro.
-     */
     public List<Paciente> buscarPacientes(String termo, String criterio) throws Exception {
         List<Paciente> pacientes = pacienteDAO.findBy(termo, criterio);
         for (Paciente p : pacientes) {
@@ -92,16 +79,7 @@ public class ClinicaFacade {
         }
         return pacientes;
     }
-    
- // Dentro da classe ClinicaFacade, na seção de Métodos para Exame
 
-    /**
-     * Busca exames por um termo e critério.
-     * @param termo O texto a ser buscado.
-     * @param criterio A coluna onde buscar ("paciente" ou "descricao").
-     * @return Uma lista de exames filtrada.
-     * @throws Exception se ocorrer um erro.
-     */
     public List<Exame> buscarExames(String termo, String criterio) throws Exception {
         return exameDAO.findBy(termo, criterio);
     }
