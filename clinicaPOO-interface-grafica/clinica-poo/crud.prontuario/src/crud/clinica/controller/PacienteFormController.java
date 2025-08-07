@@ -1,87 +1,86 @@
 package crud.clinica.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-
-import crud.clinica.dao.PacienteDAO;
 import crud.clinica.exception.CPFJaExisteException;
+import crud.clinica.facade.ClinicaFacade;
 import crud.clinica.model.Paciente;
 import crud.clinica.view.paciente.PacienteFormDialog;
 import crud.clinica.view.util.DialogManager;
 import crud.clinica.view.util.ValidacaoUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 /**
  * Controller responsável pela lógica de negócio da tela de formulário de Paciente.
- * Ele intermedia a comunicação entre a View (PacienteFormDialog) e o Model/DAO.
  */
 public class PacienteFormController {
 
     private final PacienteFormDialog view;
-    private final PacienteDAO pacienteDAO;
-    private Paciente paciente; // O paciente que está sendo criado ou editado
+    private final ClinicaFacade facade;
+    private Paciente paciente; 
 
-    public PacienteFormController(PacienteFormDialog view, PacienteDAO pacienteDAO, Paciente paciente) {
+    public PacienteFormController(PacienteFormDialog view, ClinicaFacade facade, Paciente paciente) {
         this.view = view;
-        this.pacienteDAO = pacienteDAO;
-        this.paciente = paciente;
+        this.facade = facade;
+        this.paciente = paciente; // Será null se for um novo cadastro, ou um objeto se for edição
     }
 
     /**
-     * Orquestra o processo de salvar (criar ou atualizar) um paciente.
-     * Pega os dados da view, valida, chama o DAO e dá feedback ao usuário.
+     * Orquestra o processo de salvar um paciente.
      */
     public void salvar() {
-        // 1. Obter dados da View
         String nome = view.getNome();
-        String cpf = view.getCpf().replaceAll("[^0-9]", ""); // Pega só os números
+        String cpf = view.getCpf(); 
         String dataNascimentoStr = view.getDataNascimento();
 
-        // 2. Validar os dados usando as classes utilitárias
+        // 1. Validações de formato dos campos
         if (!ValidacaoUtil.validarNome(nome)) {
             DialogManager.showError(view, "Nome inválido. Deve ter entre 3 e 100 caracteres.");
             return;
         }
         if (!ValidacaoUtil.validarCPF(cpf)) {
-            DialogManager.showError(view, "CPF inválido. Verifique o número digitado.");
+            DialogManager.showError(view, "CPF inválido. Verifique o formato e os dígitos.");
             return;
         }
-        if (!ValidacaoUtil.validarData(dataNascimentoStr)) {
-            DialogManager.showError(view, "Data de Nascimento inválida. Use o formato DD/MM/AAAA.");
+        if (dataNascimentoStr.contains("_") || !ValidacaoUtil.validarData(dataNascimentoStr)) {
+            DialogManager.showError(view, "Data de Nascimento inválida ou incompleta.");
             return;
         }
 
-        // 3. Converter e preparar o objeto Model
         try {
+            // 2. Preparação do objeto Model
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDateTime nascimento = LocalDate.parse(dataNascimentoStr, formatter).atStartOfDay();
 
-            // 4. Decidir entre criar um novo ou atualizar um existente
-            if (paciente == null) {
-                // Modo de Criação
-                paciente = new Paciente(nome, view.getCpf(), nascimento); // Salva com máscara
-                pacienteDAO.create(paciente);
-                DialogManager.showSuccess(view, "Paciente cadastrado com sucesso!");
-            } else {
-                // Modo de Edição
-                paciente.setNome(nome);
-                paciente.setCpf(view.getCpf()); // Salva com máscara
-                paciente.setDataNascimento(nascimento);
-                pacienteDAO.update(paciente);
-                DialogManager.showSuccess(view, "Paciente atualizado com sucesso!");
+            // PONTO DA CORREÇÃO: Lógica de criação/edição explícita
+            // Usamos uma variável local 'pacienteParaSalvar' para garantir
+            // que um objeto válido seja sempre passado para a facade.
+            Paciente pacienteParaSalvar;
+
+            if (this.paciente == null) { // Modo Criação: cria uma NOVA instância
+                pacienteParaSalvar = new Paciente(nome, cpf, nascimento);
+            } else { // Modo Edição: atualiza a instância que já existe
+                this.paciente.setNome(nome);
+                this.paciente.setCpf(cpf);
+                this.paciente.setDataNascimento(nascimento);
+                pacienteParaSalvar = this.paciente;
             }
 
-            // 5. Fechar a janela em caso de sucesso
+            // 3. Chamada à Facade com um objeto garantidamente não-nulo
+            facade.salvarPaciente(pacienteParaSalvar); 
+            
+            DialogManager.showSuccess(view, "Paciente salvo com sucesso!");
             view.dispose();
 
-        } catch (DateTimeParseException ex) {
-            DialogManager.showError(view, "Erro no formato da data. Certifique-se que é DD/MM/AAAA.");
         } catch (CPFJaExisteException ex) {
             DialogManager.showError(view, ex.getMessage());
-        } catch (Exception ex) {
-            DialogManager.showError(view, "Ocorreu um erro inesperado ao salvar o paciente.\nDetalhes: " + ex.getMessage());
-            ex.printStackTrace(); // Logar o erro no console para debug
+        } catch (DateTimeParseException e) {
+            DialogManager.showError(view, "Erro no formato da data. Certifique-se que é DD/MM/AAAA.");
+        } catch (Exception e) {
+            DialogManager.showError(view, "Ocorreu um erro inesperado ao salvar: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

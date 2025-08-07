@@ -5,26 +5,45 @@ import crud.clinica.facade.ClinicaFacade;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ExameListDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private final JTable table;
+    private final JButton btnEditar;
+    private final JButton btnExcluir;
+    private final JTextField txtPesquisa;
+    private final JRadioButton rbPaciente;
+    private final JRadioButton rbDescricao;
+    
     private final ExameListController controller;
 
     public ExameListDialog(Window parent, ClinicaFacade facade, boolean podeEditar, boolean podeExcluir) {
         super(parent, "Gerenciar Exames", ModalityType.APPLICATION_MODAL);
-
-        // A View cria seu Controller, que conterá toda a lógica
-        this.controller = new ExameListController(this, facade);
-
-        setSize(800, 400);
+        
+        setSize(800, 450);
         setLocationRelativeTo(parent);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(10,10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // --- Painel de Pesquisa ---
+        JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        rbPaciente = new JRadioButton("Nome do Paciente", true);
+        rbDescricao = new JRadioButton("Descrição do Exame");
+        ButtonGroup grupoRadio = new ButtonGroup();
+        grupoRadio.add(rbPaciente);
+        grupoRadio.add(rbDescricao);
+        txtPesquisa = new JTextField(25);
+
+        painelPesquisa.add(new JLabel("Pesquisar por:"));
+        painelPesquisa.add(rbPaciente);
+        painelPesquisa.add(rbDescricao);
+        painelPesquisa.add(txtPesquisa);
+        add(painelPesquisa, BorderLayout.NORTH);
+
         // --- Tabela ---
-        // Usando nosso novo e elegante ExameTableModel!
         table = new JTable(new ExameTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
@@ -32,8 +51,8 @@ public class ExameListDialog extends JDialog {
 
         // --- Painel de Botões ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnEditar = new JButton("Editar");
-        JButton btnExcluir = new JButton("Excluir");
+        btnEditar = new JButton("Editar");
+        btnExcluir = new JButton("Excluir");
         JButton btnFechar = new JButton("Fechar");
 
         if (podeEditar) buttonPanel.add(btnEditar);
@@ -41,12 +60,26 @@ public class ExameListDialog extends JDialog {
         buttonPanel.add(btnFechar);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // --- Listeners delegados ao Controller ---
+        btnEditar.setEnabled(false);
+        btnExcluir.setEnabled(false);
+        
+        // --- Criação do Controller ---
+        this.controller = new ExameListController(this, facade);
+
+        // --- Listeners ---
         btnEditar.addActionListener(e -> controller.editarExame());
         btnExcluir.addActionListener(e -> controller.excluirExame());
         btnFechar.addActionListener(e -> dispose());
 
-        // Listener para habilitar/desabilitar botões conforme a seleção
+        txtPesquisa.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                controller.filtrarExames();
+            }
+        });
+        rbPaciente.addActionListener(e -> controller.filtrarExames());
+        rbDescricao.addActionListener(e -> controller.filtrarExames());
+        
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean linhaSelecionada = table.getSelectedRow() != -1;
@@ -55,16 +88,11 @@ public class ExameListDialog extends JDialog {
             }
         });
         
-        // Desabilitar botões no início
-        btnEditar.setEnabled(false);
-        btnExcluir.setEnabled(false);
-
-        // O Controller é quem carrega os dados
         controller.carregarDadosIniciais();
     }
 
-    // Getter para que o Controller possa acessar a tabela
-    public JTable getTable() {
-        return table;
-    }
+    // --- Getters para o Controller ---
+    public JTable getTable() { return table; }
+    public String getTermoBusca() { return txtPesquisa.getText(); }
+    public String getCriterioBusca() { return rbPaciente.isSelected() ? "paciente" : "descricao"; }
 }

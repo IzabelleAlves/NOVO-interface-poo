@@ -12,7 +12,6 @@ public class DatabaseManager {
     private static Connection connection;
     private static DatabaseConfig config;
 
-    // Este método deve ser chamado UMA VEZ no início da sua aplicação
     public static void setupDatabase() throws Exception {
         config = new DatabaseConfig("src/dbconfig.txt");
         
@@ -31,28 +30,14 @@ public class DatabaseManager {
         try (Connection conn = DriverManager.getConnection(urlComDb, config.getDbUser(), config.getDbPassword());
              Statement stmt = conn.createStatement()) {
             
-            String sqlPacientes = """
-                CREATE TABLE IF NOT EXISTS pacientes (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    nome VARCHAR(255) NOT NULL,
-                    cpf VARCHAR(14) NOT NULL UNIQUE,
-                    data_nascimento DATETIME NOT NULL
-                )""";
+            String sqlPacientes = "CREATE TABLE IF NOT EXISTS pacientes ( id BIGINT PRIMARY KEY AUTO_INCREMENT, nome VARCHAR(255) NOT NULL, cpf VARCHAR(14) NOT NULL UNIQUE, data_nascimento DATETIME NOT NULL )";
             stmt.executeUpdate(sqlPacientes);
 
-            String sqlExames = """
-                CREATE TABLE IF NOT EXISTS exames (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    descricao VARCHAR(255) NOT NULL,
-                    data_exame DATE NOT NULL,
-                    paciente_id BIGINT NOT NULL,
-                    FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE
-                )""";
+            String sqlExames = "CREATE TABLE IF NOT EXISTS exames ( id BIGINT PRIMARY KEY AUTO_INCREMENT, descricao VARCHAR(255) NOT NULL, data_exame DATE NOT NULL, paciente_id BIGINT NOT NULL, FOREIGN KEY (paciente_id) REFERENCES pacientes(id) ON DELETE CASCADE )";
             stmt.executeUpdate(sqlExames);
         }
     }
 
-    // A classe IConnection agora usa o DatabaseManager
     public static class MySQLConnection implements IConnection {
         @Override
         public Connection getConnection() throws SQLException {

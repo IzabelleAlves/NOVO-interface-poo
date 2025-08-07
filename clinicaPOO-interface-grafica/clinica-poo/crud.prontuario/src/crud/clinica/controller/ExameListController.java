@@ -77,4 +77,29 @@ public class ExameListController {
         // Após o formulário de edição fechar, recarrega os dados para ver as atualizações
         carregarDadosIniciais();
     }
+    
+ // Dentro da classe ExameListController
+
+ // Adicione este novo método
+ /**
+  * Filtra a lista de exames com base nos dados da view.
+  */
+ public void filtrarExames() {
+     String termo = view.getTermoBusca();
+     String criterio = view.getCriterioBusca();
+
+     try {
+         List<Exame> exames;
+         if (termo.trim().isEmpty()) {
+             // Se a busca estiver vazia, carrega todos os exames
+             exames = facade.listarTodosExames();
+         } else {
+             // Senão, busca no banco com o filtro
+             exames = facade.buscarExames(termo, criterio);
+         }
+         tableModel.setExames(exames);
+     } catch (Exception e) {
+         DialogManager.showError(view, "Erro ao filtrar exames: " + e.getMessage());
+     }
+ }
 }

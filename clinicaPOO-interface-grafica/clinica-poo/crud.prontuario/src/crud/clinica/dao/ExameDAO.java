@@ -221,5 +221,55 @@ public class ExameDAO implements IEntityDAO<Exame> {
 
         return exames;
     }
+    
+ // Dentro da classe ExameDAO.java
+
+    /**
+     * Busca exames por um critério específico (nome do paciente ou descrição do exame).
+     * @param termo O texto a ser buscado.
+     * @param criterio A coluna onde buscar ("paciente" ou "descricao").
+     * @return Uma lista de exames que correspondem à busca.
+     * @throws SQLException se ocorrer um erro de SQL.
+     */
+    public List<Exame> findBy(String termo, String criterio) throws SQLException {
+        List<Exame> exames = new ArrayList<>();
+        
+        String sql;
+        // Monta a query SQL dinamicamente com base no critério
+        if (criterio.equalsIgnoreCase("paciente")) {
+            sql = "SELECT e.id, e.descricao, e.data_exame, p.id as paciente_id, p.nome as paciente_nome " +
+                  "FROM exames e JOIN pacientes p ON e.paciente_id = p.id " +
+                  "WHERE LOWER(p.nome) LIKE LOWER(?);";
+        } else if (criterio.equalsIgnoreCase("descricao")) {
+            sql = "SELECT e.id, e.descricao, e.data_exame, p.id as paciente_id, p.nome as paciente_nome " +
+                  "FROM exames e JOIN pacientes p ON e.paciente_id = p.id " +
+                  "WHERE LOWER(e.descricao) LIKE LOWER(?);";
+        } else {
+            throw new IllegalArgumentException("Critério de busca de exame inválido.");
+        }
+
+        try (PreparedStatement pstm = conn.getConnection().prepareStatement(sql)) {
+            pstm.setString(1, "%" + termo + "%");
+            
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    Exame exame = new Exame();
+                    exame.setId(rs.getLong("id"));
+                    exame.setDescricao(rs.getString("descricao"));
+                    exame.setData_exame(rs.getDate("data_exame").toLocalDate());
+
+                    Paciente paciente = new Paciente();
+                    paciente.setId(rs.getLong("paciente_id"));
+                    paciente.setNome(rs.getString("paciente_nome"));
+                    exame.setPaciente(paciente);
+
+                    exames.add(exame);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Erro ao buscar exames por " + criterio, e);
+        }
+        return exames;
+    }
 
 }

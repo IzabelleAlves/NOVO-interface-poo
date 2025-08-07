@@ -1,8 +1,6 @@
 package crud.clinica.view.paciente;
 
-import crud.clinica.controller.PacienteFormController; // Importa o controller
-import crud.clinica.dao.PacienteDAO;
-import crud.clinica.database.IConnection;
+import crud.clinica.controller.PacienteFormController; // Importa o controller com o nome correto
 import crud.clinica.facade.ClinicaFacade;
 import crud.clinica.model.Paciente;
 
@@ -21,23 +19,24 @@ public class PacienteFormDialog extends JDialog {
     private JFormattedTextField dataNascimentoField;
 
     // --- Controller ---
+    // PONTO DA MUDANÇA: O nome da classe do controller foi atualizado aqui.
     private final PacienteFormController controller;
 
     public PacienteFormDialog(Window parent, ClinicaFacade facade, Paciente paciente) {
         super(parent, paciente == null ? "Cadastrar Paciente" : "Editar Paciente", ModalityType.APPLICATION_MODAL);
         
-        // A View agora cria seu próprio Controller, passando as dependências para ele
-        this.controller = new PacienteFormController(this, new PacienteDAO((IConnection) facade), paciente);
+        // PONTO DA MUDANÇA: A View agora cria seu próprio Controller com o nome correto.
+        this.controller = new PacienteFormController(this, facade, paciente);
 
         setSize(350, 220);
         setLayout(new BorderLayout(10, 10));
         setLocationRelativeTo(parent);
         setResizable(false);
+        getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // --- Painel de Formulário ---
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adiciona um pouco de espaço
-
+        
         formPanel.add(new JLabel("Nome:"));
         nomeField = new JTextField();
         formPanel.add(nomeField);
@@ -48,7 +47,7 @@ public class PacienteFormDialog extends JDialog {
             cpfMask.setPlaceholderCharacter('_');
             cpfField = new JFormattedTextField(cpfMask);
         } catch (ParseException e) {
-            cpfField = new JFormattedTextField(); // Fallback
+            cpfField = new JFormattedTextField();
         }
         formPanel.add(cpfField);
 
@@ -58,30 +57,27 @@ public class PacienteFormDialog extends JDialog {
             dataMask.setPlaceholderCharacter('_');
             dataNascimentoField = new JFormattedTextField(dataMask);
         } catch (ParseException e) {
-            dataNascimentoField = new JFormattedTextField(); // Fallback
+            dataNascimentoField = new JFormattedTextField();
         }
         formPanel.add(dataNascimentoField);
+        add(formPanel, BorderLayout.CENTER);
 
         // --- Painel de Botões ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSalvar = new JButton(paciente == null ? "Salvar" : "Atualizar");
-        buttonPanel.add(btnSalvar);
+        JButton btnSair = new JButton("Sair");
 
+        buttonPanel.add(btnSalvar);
         if (paciente == null) {
             JButton btnLimpar = new JButton("Limpar");
             buttonPanel.add(btnLimpar);
             btnLimpar.addActionListener(e -> limparCampos());
         }
-
-        JButton btnSair = new JButton("Sair");
         buttonPanel.add(btnSair);
-
-        // --- Adicionando painéis à janela ---
-        add(formPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
         // --- Action Listeners ---
-        // A ação agora é delegada para o método salvar do CONTROLLER
+        // A ação do botão é delegada ao controller
         btnSalvar.addActionListener(e -> controller.salvar());
         btnSair.addActionListener(e -> dispose());
         
@@ -92,19 +88,11 @@ public class PacienteFormDialog extends JDialog {
     }
     
     // --- Métodos de acesso para o Controller ---
-    public String getNome() {
-        return nomeField.getText().trim();
-    }
-    
-    public String getCpf() {
-        return cpfField.getText();
-    }
-    
-    public String getDataNascimento() {
-        return dataNascimentoField.getText();
-    }
+    public String getNome() { return nomeField.getText().trim(); }
+    public String getCpf() { return cpfField.getText(); }
+    public String getDataNascimento() { return dataNascimentoField.getText(); }
 
-    // --- Métodos de manipulação da UI ---
+    // --- Métodos internos da View ---
     private void limparCampos() {
         nomeField.setText("");
         cpfField.setValue(null);

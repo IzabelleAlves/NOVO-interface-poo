@@ -3,7 +3,6 @@ package crud.clinica.view.paciente;
 import crud.clinica.controller.PacienteListController;
 import crud.clinica.facade.ClinicaFacade;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,14 +13,15 @@ public class PacienteListDialog extends JDialog {
     private final JTable table;
     private final JButton btnEditar;
     private final JButton btnExcluir;
+    private final JTextField txtPesquisa;
+    private final JRadioButton rbNome;
+    private final JRadioButton rbCpf;
     
     private final PacienteListController controller;
 
     public PacienteListDialog(Window parent, ClinicaFacade facade, boolean podeEditar, boolean podeExcluir) {
         super(parent, "Gerenciar Pacientes", ModalityType.APPLICATION_MODAL);
         
-        this.controller = new PacienteListController(this, facade);
-
         setSize(800, 450);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10,10));
@@ -29,22 +29,20 @@ public class PacienteListDialog extends JDialog {
 
         // --- Painel de Pesquisa ---
         JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        // ... (código para criar os componentes de pesquisa continua igual)
-        // Por simplicidade, o filtro foi delegado para o controller, mas a UI não muda.
-        JTextField txtPesquisa = new JTextField(20);
-        txtPesquisa.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // Ação de filtro delegada ao controller
-                controller.filtrarPacientes(); 
-            }
-        });
-        painelPesquisa.add(new JLabel("Pesquisar:"));
+        rbNome = new JRadioButton("Nome", true);
+        rbCpf = new JRadioButton("CPF");
+        ButtonGroup grupoRadio = new ButtonGroup();
+        grupoRadio.add(rbNome);
+        grupoRadio.add(rbCpf);
+        txtPesquisa = new JTextField(25);
+
+        painelPesquisa.add(new JLabel("Pesquisar por:"));
+        painelPesquisa.add(rbNome);
+        painelPesquisa.add(rbCpf);
         painelPesquisa.add(txtPesquisa);
         add(painelPesquisa, BorderLayout.NORTH);
 
         // --- Tabela ---
-        // Usando nosso novo TableModel!
         table = new JTable(new PacienteTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
@@ -61,29 +59,39 @@ public class PacienteListDialog extends JDialog {
         buttonPanel.add(btnFechar);
         add(buttonPanel, BorderLayout.SOUTH);
 
+        btnEditar.setEnabled(false);
+        btnExcluir.setEnabled(false);
+
+        // --- Criação do Controller ---
+        this.controller = new PacienteListController(this, facade);
+
         // --- Listeners ---
         btnEditar.addActionListener(e -> controller.editarPaciente());
         btnExcluir.addActionListener(e -> controller.excluirPaciente());
         btnFechar.addActionListener(e -> dispose());
         
-        table.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+        // Listeners da busca que chamam o controller
+        txtPesquisa.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                controller.filtrarPacientes();
+            }
+        });
+        rbNome.addActionListener(e -> controller.filtrarPacientes());
+        rbCpf.addActionListener(e -> controller.filtrarPacientes());
+        
+        table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean linhaSelecionada = table.getSelectedRow() != -1;
                 btnEditar.setEnabled(linhaSelecionada && podeEditar);
                 btnExcluir.setEnabled(linhaSelecionada && podeExcluir);
             }
         });
-
-        // Desabilitar botões inicialmente
-        btnEditar.setEnabled(false);
-        btnExcluir.setEnabled(false);
-
-        // Carrega os dados iniciais através do controller
+        
         controller.carregarDadosIniciais();
     }
 
-    // Getter para o controller acessar a tabela
-    public JTable getTable() {
-        return table;
-    }
+    public JTable getTable() { return table; }
+    public String getTermoBusca() { return txtPesquisa.getText(); }
+    public String getCriterioBusca() { return rbNome.isSelected() ? "nome" : "cpf"; }
 }

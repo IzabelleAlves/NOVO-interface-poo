@@ -68,9 +68,35 @@ public class PacienteListController {
     }
     
     // Este método deveria ser implementado na Facade/DAO para eficiência
-    public void filtrarPacientes() {
-        // Por simplicidade, manteremos o filtro em memória por enquanto,
-        // mas o ideal seria a facade ter um método facade.buscarPaciente(termo, criterio)
-        carregarDadosIniciais(); // Em uma versão futura, isso seria substituído
-    }
+//    public void filtrarPacientes() {
+//        // Por simplicidade, manteremos o filtro em memória por enquanto,
+//        // mas o ideal seria a facade ter um método facade.buscarPaciente(termo, criterio)
+//        carregarDadosIniciais(); // Em uma versão futura, isso seria substituído
+//    }
+//    
+ // Dentro da classe PacienteListController
+
+ // Substitua o método filtrarPacientes() antigo por este.
+ /**
+  * Filtra a lista de pacientes com base nos dados da view.
+  */
+ public void filtrarPacientes() {
+     String termo = view.getTermoBusca();
+     String criterio = view.getCriterioBusca();
+
+     try {
+         List<Paciente> pacientes;
+         if (termo.trim().isEmpty()) {
+             // Se a busca estiver vazia, carrega todos
+             pacientes = facade.listarPacientesComContagemDeExames();
+         } else {
+             // Senão, busca no banco com o filtro
+             pacientes = facade.buscarPacientes(termo, criterio);
+         }
+         tableModel.setPacientes(pacientes);
+     } catch (Exception e) {
+         DialogManager.showError(view, "Erro ao filtrar pacientes: " + e.getMessage());
+     }
+ }
+    
 }
