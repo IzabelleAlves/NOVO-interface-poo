@@ -74,7 +74,7 @@ public class MainView extends JFrame {
         menuExames.add(itemLocalizarExame);
         menuExames.add(itemExcluirExame);
 
-        // --- Menu Sair ---
+
         JMenu menuSair = new JMenu("Sair");
         JMenuItem itemSair = new JMenuItem("Sair");
         itemSair.addActionListener(this::confirmarSaida);
@@ -85,7 +85,6 @@ public class MainView extends JFrame {
         menuBar.add(menuSair);
         setJMenuBar(menuBar);
 
-        // --- Painel Central (sem alterações) ---
         JPanel painelCentral = new JPanel(new BorderLayout());
         JLabel labelBemVindo = new JLabel("Bem-vindo ao Sistema da Clínica", SwingConstants.CENTER);
         labelBemVindo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -93,40 +92,32 @@ public class MainView extends JFrame {
         add(painelCentral, BorderLayout.CENTER);
     }
 
-    // --- PONTO DA MUDANÇA: Lógica para abrir as janelas ---
     private void abrirJanela(String titulo) {
         switch (titulo) {
-            // --- Casos de Paciente ---
+
             case "Novo Paciente":
                 new PacienteFormDialog(this, this.facade, null).setVisible(true);
                 break;
             case "Editar Paciente":
-                // Abre a lista com o botão "Editar" habilitado
                 new PacienteListDialog(this, this.facade, true, false).setVisible(true);
                 break;
             case "Excluir Paciente":
-                // Abre a lista com o botão "Excluir" habilitado
                 new PacienteListDialog(this, this.facade, false, true).setVisible(true);
                 break;
             case "Localizar Paciente":
-                // Abre a lista em modo de visualização/pesquisa
                 new PacienteListDialog(this, this.facade, false, false).setVisible(true);
                 break;
             
-            // --- Casos de Exame ---
             case "Novo Exame":
                 new ExameFormDialog(this, this.facade, null).setVisible(true);
                 break;
             case "Editar Exame":
-                // Abre a lista com o botão "Editar" habilitado
                 new ExameListDialog(this, this.facade, true, false).setVisible(true);
                 break;
             case "Excluir Exame":
-                // Abre a lista com o botão "Excluir" habilitado
                 new ExameListDialog(this, this.facade, false, true).setVisible(true);
                 break;
             case "Localizar Exame":
-                 // Abre a lista em modo de visualização/pesquisa
                  new ExameListDialog(this, this.facade, false, false).setVisible(true);
                  break;
 
