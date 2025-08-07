@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-/**
- * Controller responsável pela lógica de negócio da tela de formulário de Paciente.
- */
 public class PacienteFormController {
 
     private final PacienteFormDialog view;
@@ -24,18 +21,14 @@ public class PacienteFormController {
     public PacienteFormController(PacienteFormDialog view, ClinicaFacade facade, Paciente paciente) {
         this.view = view;
         this.facade = facade;
-        this.paciente = paciente; // Será null se for um novo cadastro, ou um objeto se for edição
+        this.paciente = paciente; 
     }
 
-    /**
-     * Orquestra o processo de salvar um paciente.
-     */
     public void salvar() {
         String nome = view.getNome();
         String cpf = view.getCpf(); 
         String dataNascimentoStr = view.getDataNascimento();
 
-        // 1. Validações de formato dos campos
         if (!ValidacaoUtil.validarNome(nome)) {
             DialogManager.showError(view, "Nome inválido. Deve ter entre 3 e 100 caracteres.");
             return;
@@ -50,25 +43,21 @@ public class PacienteFormController {
         }
 
         try {
-            // 2. Preparação do objeto Model
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDateTime nascimento = LocalDate.parse(dataNascimentoStr, formatter).atStartOfDay();
 
-            // PONTO DA CORREÇÃO: Lógica de criação/edição explícita
-            // Usamos uma variável local 'pacienteParaSalvar' para garantir
-            // que um objeto válido seja sempre passado para a facade.
             Paciente pacienteParaSalvar;
 
-            if (this.paciente == null) { // Modo Criação: cria uma NOVA instância
+            if (this.paciente == null) { 
                 pacienteParaSalvar = new Paciente(nome, cpf, nascimento);
-            } else { // Modo Edição: atualiza a instância que já existe
+            } else {
                 this.paciente.setNome(nome);
                 this.paciente.setCpf(cpf);
                 this.paciente.setDataNascimento(nascimento);
                 pacienteParaSalvar = this.paciente;
             }
 
-            // 3. Chamada à Facade com um objeto garantidamente não-nulo
             facade.salvarPaciente(pacienteParaSalvar); 
             
             DialogManager.showSuccess(view, "Paciente salvo com sucesso!");

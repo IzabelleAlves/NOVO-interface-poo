@@ -23,7 +23,6 @@ public class PacienteListController {
 
     public void carregarDadosIniciais() {
         try {
-            // Usa o método da facade que já busca a contagem de exames
             List<Paciente> pacientes = facade.listarPacientesComContagemDeExames();
             tableModel.setPacientes(pacientes);
         } catch (Exception e) {
@@ -43,7 +42,7 @@ public class PacienteListController {
                 Paciente paciente = tableModel.getPacienteAt(selectedRow);
                 facade.deletarPaciente(paciente.getId());
                 DialogManager.showSuccess(view, "Paciente excluído com sucesso.");
-                carregarDadosIniciais(); // Recarrega a lista
+                carregarDadosIniciais(); 
             } catch (Exception e) {
                 DialogManager.showError(view, "Erro ao excluir paciente: " + e.getMessage());
             }
@@ -59,27 +58,13 @@ public class PacienteListController {
         
         Paciente paciente = tableModel.getPacienteAt(selectedRow);
         
-        // Abre o formulário de edição, passando a facade e o paciente selecionado
         PacienteFormDialog form = new PacienteFormDialog(view, facade, paciente);
         form.setVisible(true);
         
-        // Após o formulário fechar, recarrega os dados para ver as atualizações
         carregarDadosIniciais();
     }
     
-    // Este método deveria ser implementado na Facade/DAO para eficiência
-//    public void filtrarPacientes() {
-//        // Por simplicidade, manteremos o filtro em memória por enquanto,
-//        // mas o ideal seria a facade ter um método facade.buscarPaciente(termo, criterio)
-//        carregarDadosIniciais(); // Em uma versão futura, isso seria substituído
-//    }
-//    
- // Dentro da classe PacienteListController
 
- // Substitua o método filtrarPacientes() antigo por este.
- /**
-  * Filtra a lista de pacientes com base nos dados da view.
-  */
  public void filtrarPacientes() {
      String termo = view.getTermoBusca();
      String criterio = view.getCriterioBusca();
@@ -87,10 +72,8 @@ public class PacienteListController {
      try {
          List<Paciente> pacientes;
          if (termo.trim().isEmpty()) {
-             // Se a busca estiver vazia, carrega todos
              pacientes = facade.listarPacientesComContagemDeExames();
          } else {
-             // Senão, busca no banco com o filtro
              pacientes = facade.buscarPacientes(termo, criterio);
          }
          tableModel.setPacientes(pacientes);

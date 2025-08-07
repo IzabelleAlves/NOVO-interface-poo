@@ -27,7 +27,6 @@ public class PacienteListDialog extends JDialog {
         setLayout(new BorderLayout(10,10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- Painel de Pesquisa ---
         JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rbNome = new JRadioButton("Nome", true);
         rbCpf = new JRadioButton("CPF");
@@ -42,13 +41,11 @@ public class PacienteListDialog extends JDialog {
         painelPesquisa.add(txtPesquisa);
         add(painelPesquisa, BorderLayout.NORTH);
 
-        // --- Tabela ---
         table = new JTable(new PacienteTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // --- Painel de Botões ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnEditar = new JButton("Editar");
         btnExcluir = new JButton("Excluir");
@@ -62,15 +59,12 @@ public class PacienteListDialog extends JDialog {
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
 
-        // --- Criação do Controller ---
         this.controller = new PacienteListController(this, facade);
 
-        // --- Listeners ---
         btnEditar.addActionListener(e -> controller.editarPaciente());
         btnExcluir.addActionListener(e -> controller.excluirPaciente());
         btnFechar.addActionListener(e -> dispose());
         
-        // Listeners da busca que chamam o controller
         txtPesquisa.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {

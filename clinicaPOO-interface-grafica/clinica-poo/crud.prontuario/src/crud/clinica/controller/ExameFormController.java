@@ -16,7 +16,7 @@ public class ExameFormController {
 
     private final ExameFormDialog view;
     private final ClinicaFacade facade;
-    private Exame exame; // O exame sendo criado ou editado
+    private Exame exame; 
 
     public ExameFormController(ExameFormDialog view, ClinicaFacade facade, Exame exame) {
         this.view = view;
@@ -24,9 +24,6 @@ public class ExameFormController {
         this.exame = exame;
     }
 
-    /**
-     * Carrega os dados iniciais necessários para a tela, como a lista de pacientes.
-     */
     public void inicializar() {
         try {
             List<Paciente> pacientes = facade.listarTodosPacientes();
@@ -36,16 +33,11 @@ public class ExameFormController {
         }
     }
 
-    /**
-     * Valida e salva o exame.
-     */
     public void salvar() {
-        // 1. Obter dados da View
         Paciente pacienteSelecionado = view.getPacienteSelecionado();
         String dataStr = view.getData();
         String descricao = view.getDescricao();
 
-        // 2. Validar os dados
         if (pacienteSelecionado == null) {
             DialogManager.showError(view, "Selecione um paciente.");
             return;
@@ -59,22 +51,19 @@ public class ExameFormController {
             return;
         }
 
-        // 3. Converter e preparar o Model
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate dataExame = LocalDate.parse(dataStr, formatter);
 
-            // 4. Decidir entre criar ou atualizar
-            if (exame == null) { // Modo Criação
+            if (exame == null) { 
                 exame = new Exame(descricao, dataExame);
                 exame.setPaciente(pacienteSelecionado);
-            } else { // Modo Edição
+            } else { 
                 exame.setDescricao(descricao);
                 exame.setData_exame(dataExame);
                 exame.setPaciente(pacienteSelecionado);
             }
 
-            // 5. Chamar a Facade para salvar
             facade.salvarExame(exame);
             DialogManager.showSuccess(view, "Exame salvo com sucesso!");
             view.dispose();

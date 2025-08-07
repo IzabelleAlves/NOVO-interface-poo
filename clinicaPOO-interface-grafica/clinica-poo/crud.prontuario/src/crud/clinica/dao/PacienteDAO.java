@@ -20,12 +20,10 @@ public class PacienteDAO implements IEntityDAO<Paciente> {
 
     @Override
     public void create(Paciente t) throws SQLException, CPFJaExisteException {
-        // 1. A verificação agora funciona, pois o método existsByCPF() está implementado.
         if (existsByCPF(t.getCpf())) {
             throw new CPFJaExisteException("Já existe um paciente com o CPF informado.");
         }
 
-        // 2. Se não houver duplicidade, a inserção é feita.
         String sql = "INSERT INTO PACIENTES (nome, cpf, data_nascimento) VALUES (?, ?, ?);";
         try (PreparedStatement pstm = conn.getConnection().prepareStatement(sql)) {
             pstm.setString(1, t.getNome());
@@ -37,7 +35,6 @@ public class PacienteDAO implements IEntityDAO<Paciente> {
 
     @Override
     public void update(Paciente t) throws SQLException, CPFJaExisteException {
-        // A verificação de CPF duplicado para OUTRO paciente foi implementada aqui.
         String sqlCheck = "SELECT id FROM pacientes WHERE cpf = ? AND id != ? LIMIT 1;";
         try (PreparedStatement pstmCheck = conn.getConnection().prepareStatement(sqlCheck)) {
             pstmCheck.setString(1, t.getCpf());
@@ -59,13 +56,12 @@ public class PacienteDAO implements IEntityDAO<Paciente> {
         }
     }
 
-    // MÉTODO AUXILIAR TOTALMENTE IMPLEMENTADO
     public boolean existsByCPF(String cpf) throws SQLException {
         String sql = "SELECT 1 FROM pacientes WHERE cpf = ? LIMIT 1;";
         try (PreparedStatement pstm = conn.getConnection().prepareStatement(sql)) {
             pstm.setString(1, cpf);
             try (ResultSet rs = pstm.executeQuery()) {
-                return rs.next(); // Retorna true se encontrou um registro, false caso contrário
+                return rs.next(); 
             }
         }
     }

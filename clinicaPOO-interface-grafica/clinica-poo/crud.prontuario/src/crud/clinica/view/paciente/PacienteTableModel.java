@@ -53,6 +53,6 @@ public class PacienteTableModel extends AbstractTableModel {
 
     public void setPacientes(List<Paciente> pacientes) {
         this.pacientes = pacientes;
-        fireTableDataChanged(); // Notifica a JTable que os dados mudaram
+        fireTableDataChanged(); 
     }
 }

@@ -221,29 +221,20 @@ public class ExameDAO implements IEntityDAO<Exame> {
 
         return exames;
     }
-    
- // Dentro da classe ExameDAO.java
 
-    /**
-     * Busca exames por um critério específico (nome do paciente ou descrição do exame).
-     * @param termo O texto a ser buscado.
-     * @param criterio A coluna onde buscar ("paciente" ou "descricao").
-     * @return Uma lista de exames que correspondem à busca.
-     * @throws SQLException se ocorrer um erro de SQL.
-     */
     public List<Exame> findBy(String termo, String criterio) throws SQLException {
         List<Exame> exames = new ArrayList<>();
         
         String sql;
-        // Monta a query SQL dinamicamente com base no critério
+
         if (criterio.equalsIgnoreCase("paciente")) {
             sql = "SELECT e.id, e.descricao, e.data_exame, p.id as paciente_id, p.nome as paciente_nome " +
                   "FROM exames e JOIN pacientes p ON e.paciente_id = p.id " +
                   "WHERE LOWER(p.nome) LIKE LOWER(?);";
-        } else if (criterio.equalsIgnoreCase("descricao")) {
-            sql = "SELECT e.id, e.descricao, e.data_exame, p.id as paciente_id, p.nome as paciente_nome " +
-                  "FROM exames e JOIN pacientes p ON e.paciente_id = p.id " +
-                  "WHERE LOWER(e.descricao) LIKE LOWER(?);";
+//        } else if (criterio.equalsIgnoreCase("descricao")) {
+//            sql = "SELECT e.id, e.descricao, e.data_exame, p.id as paciente_id, p.nome as paciente_nome " +
+//                  "FROM exames e JOIN pacientes p ON e.paciente_id = p.id " +
+//                  "WHERE LOWER(e.descricao) LIKE LOWER(?);";
         } else {
             throw new IllegalArgumentException("Critério de busca de exame inválido.");
         }

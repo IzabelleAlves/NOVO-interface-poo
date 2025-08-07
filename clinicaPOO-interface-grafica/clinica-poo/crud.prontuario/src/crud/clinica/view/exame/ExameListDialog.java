@@ -28,7 +28,7 @@ public class ExameListDialog extends JDialog {
         setLayout(new BorderLayout(10,10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- Painel de Pesquisa ---
+
         JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rbPaciente = new JRadioButton("Nome do Paciente", true);
         rbDescricao = new JRadioButton("Descrição do Exame");
@@ -39,17 +39,17 @@ public class ExameListDialog extends JDialog {
 
         painelPesquisa.add(new JLabel("Pesquisar por:"));
         painelPesquisa.add(rbPaciente);
-        painelPesquisa.add(rbDescricao);
+//        painelPesquisa.add(rbDescricao);
         painelPesquisa.add(txtPesquisa);
         add(painelPesquisa, BorderLayout.NORTH);
 
-        // --- Tabela ---
+
         table = new JTable(new ExameTableModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // --- Painel de Botões ---
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnEditar = new JButton("Editar");
         btnExcluir = new JButton("Excluir");
@@ -63,10 +63,10 @@ public class ExameListDialog extends JDialog {
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
         
-        // --- Criação do Controller ---
+
         this.controller = new ExameListController(this, facade);
 
-        // --- Listeners ---
+
         btnEditar.addActionListener(e -> controller.editarExame());
         btnExcluir.addActionListener(e -> controller.excluirExame());
         btnFechar.addActionListener(e -> dispose());
@@ -91,7 +91,7 @@ public class ExameListDialog extends JDialog {
         controller.carregarDadosIniciais();
     }
 
-    // --- Getters para o Controller ---
+
     public JTable getTable() { return table; }
     public String getTermoBusca() { return txtPesquisa.getText(); }
     public String getCriterioBusca() { return rbPaciente.isSelected() ? "paciente" : "descricao"; }

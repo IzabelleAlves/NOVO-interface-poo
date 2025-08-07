@@ -8,7 +8,12 @@ import java.util.List;
 
 public class ExameTableModel extends AbstractTableModel {
 
-    // Define as colunas da tabela
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
     private final String[] colunas = {"ID", "Descrição", "Data do Exame", "Paciente"};
     private List<Exame> exames;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -40,18 +45,13 @@ public class ExameTableModel extends AbstractTableModel {
             case 1: return exame.getDescricao();
             case 2: return exame.getData_exame() != null ? exame.getData_exame().format(formatter) : "";
             case 3: 
-                // Retorna o nome do paciente. O objeto Paciente dentro de Exame deve estar preenchido.
+               
                 return (exame.getPaciente() != null) ? exame.getPaciente().getNome() : "Não informado";
             default: 
                 return null;
         }
     }
 
-    /**
-     * Retorna o objeto Exame completo da linha selecionada.
-     * @param rowIndex O índice da linha.
-     * @return O objeto Exame correspondente.
-     */
     public Exame getExameAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < exames.size()) {
             return exames.get(rowIndex);
@@ -59,12 +59,8 @@ public class ExameTableModel extends AbstractTableModel {
         return null;
     }
 
-    /**
-     * Atualiza a lista de exames na tabela e notifica a JTable da mudança.
-     * @param exames A nova lista de exames a ser exibida.
-     */
     public void setExames(List<Exame> exames) {
         this.exames = exames;
-        fireTableDataChanged(); // Essencial para atualizar a JTable
+        fireTableDataChanged(); 
     }
 }
