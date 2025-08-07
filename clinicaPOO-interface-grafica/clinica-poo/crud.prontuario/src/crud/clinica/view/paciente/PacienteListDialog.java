@@ -27,13 +27,20 @@ public class PacienteListDialog extends JDialog {
         setLayout(new BorderLayout(10,10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // --- PAINEL DE PESQUISA ---
         JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rbNome = new JRadioButton("Nome", true);
+        rbNome.setToolTipText("Buscar pacientes pelo nome");
+        
         rbCpf = new JRadioButton("CPF");
+        rbCpf.setToolTipText("Buscar pacientes pelo número do CPF"); 
+
         ButtonGroup grupoRadio = new ButtonGroup();
         grupoRadio.add(rbNome);
         grupoRadio.add(rbCpf);
+        
         txtPesquisa = new JTextField(25);
+        txtPesquisa.setToolTipText("Digite aqui o termo que deseja pesquisar");
 
         painelPesquisa.add(new JLabel("Pesquisar por:"));
         painelPesquisa.add(rbNome);
@@ -41,15 +48,23 @@ public class PacienteListDialog extends JDialog {
         painelPesquisa.add(txtPesquisa);
         add(painelPesquisa, BorderLayout.NORTH);
 
+
         table = new JTable(new PacienteTableModel());
+        table.setToolTipText("Lista de pacientes cadastrados. Clique em uma linha para selecionar.");
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
+       
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnEditar = new JButton("Editar");
+        btnEditar.setToolTipText("Editar os dados do paciente selecionado na tabela"); 
+        
         btnExcluir = new JButton("Excluir");
+        btnExcluir.setToolTipText("Excluir o paciente selecionado (Ação permanente!)"); 
+        
         JButton btnFechar = new JButton("Fechar");
+        btnFechar.setToolTipText("Fechar esta janela de gerenciamento");
 
         if (podeEditar) buttonPanel.add(btnEditar);
         if (podeExcluir) buttonPanel.add(btnExcluir);
@@ -58,6 +73,7 @@ public class PacienteListDialog extends JDialog {
 
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
+
 
         this.controller = new PacienteListController(this, facade);
 

@@ -28,23 +28,30 @@ public class ExameListDialog extends JDialog {
         setLayout(new BorderLayout(10,10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-
+        // --- PAINEL DE PESQUISA ---
         JPanel painelPesquisa = new JPanel(new FlowLayout(FlowLayout.LEFT));
         rbPaciente = new JRadioButton("Nome do Paciente", true);
+        rbPaciente.setToolTipText("Buscar exames pelo nome do paciente associado"); 
+        
         rbDescricao = new JRadioButton("Descrição do Exame");
+        rbDescricao.setToolTipText("Buscar exames pela sua descrição (ex: Raio-X, Hemograma)"); 
+        
         ButtonGroup grupoRadio = new ButtonGroup();
         grupoRadio.add(rbPaciente);
         grupoRadio.add(rbDescricao);
+        
         txtPesquisa = new JTextField(25);
+        txtPesquisa.setToolTipText("Digite o termo para a busca e pressione Enter"); 
 
         painelPesquisa.add(new JLabel("Pesquisar por:"));
         painelPesquisa.add(rbPaciente);
-//        painelPesquisa.add(rbDescricao);
+//        painelPesquisa.add(rbDescricao); 
         painelPesquisa.add(txtPesquisa);
         add(painelPesquisa, BorderLayout.NORTH);
 
 
         table = new JTable(new ExameTableModel());
+        table.setToolTipText("Lista de exames registrados. Clique em uma linha para selecionar."); 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFillsViewportHeight(true);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -52,8 +59,13 @@ public class ExameListDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnEditar = new JButton("Editar");
+        btnEditar.setToolTipText("Editar o exame selecionado na tabela"); 
+        
         btnExcluir = new JButton("Excluir");
+        btnExcluir.setToolTipText("Excluir o exame selecionado (Ação permanente!)");
+        
         JButton btnFechar = new JButton("Fechar");
+        btnFechar.setToolTipText("Fechar esta janela");
 
         if (podeEditar) buttonPanel.add(btnEditar);
         if (podeExcluir) buttonPanel.add(btnExcluir);
@@ -63,9 +75,7 @@ public class ExameListDialog extends JDialog {
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
         
-
         this.controller = new ExameListController(this, facade);
-
 
         btnEditar.addActionListener(e -> controller.editarExame());
         btnExcluir.addActionListener(e -> controller.excluirExame());
@@ -90,7 +100,6 @@ public class ExameListDialog extends JDialog {
         
         controller.carregarDadosIniciais();
     }
-
 
     public JTable getTable() { return table; }
     public String getTermoBusca() { return txtPesquisa.getText(); }

@@ -30,10 +30,12 @@ public class PacienteFormDialog extends JDialog {
         setResizable(false);
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // --- PAINEL DO FORMULÁRIO ---
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 5));
         
         formPanel.add(new JLabel("Nome:"));
         nomeField = new JTextField();
+        nomeField.setToolTipText("Digite o nome completo do paciente"); 
         formPanel.add(nomeField);
 
         formPanel.add(new JLabel("CPF:"));
@@ -44,6 +46,7 @@ public class PacienteFormDialog extends JDialog {
         } catch (ParseException e) {
             cpfField = new JFormattedTextField();
         }
+        cpfField.setToolTipText("Digite o CPF do paciente");
         formPanel.add(cpfField);
 
         formPanel.add(new JLabel("Data de Nascimento:"));
@@ -54,16 +57,22 @@ public class PacienteFormDialog extends JDialog {
         } catch (ParseException e) {
             dataNascimentoField = new JFormattedTextField();
         }
+        dataNascimentoField.setToolTipText("Digite a data no formato Dia/Mês/Ano"); 
         formPanel.add(dataNascimentoField);
         add(formPanel, BorderLayout.CENTER);
 
+        // --- PAINEL DE BOTÕES ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSalvar = new JButton(paciente == null ? "Salvar" : "Atualizar");
+        btnSalvar.setToolTipText("Gravar os dados do paciente no sistema"); 
+        
         JButton btnSair = new JButton("Sair");
+        btnSair.setToolTipText("Fechar o formulário sem salvar");
 
         buttonPanel.add(btnSalvar);
         if (paciente == null) {
             JButton btnLimpar = new JButton("Limpar");
+            btnLimpar.setToolTipText("Limpar todos os campos preenchidos");
             buttonPanel.add(btnLimpar);
             btnLimpar.addActionListener(e -> limparCampos());
         }

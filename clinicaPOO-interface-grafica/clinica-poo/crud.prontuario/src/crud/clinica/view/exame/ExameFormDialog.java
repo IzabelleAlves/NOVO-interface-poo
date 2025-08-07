@@ -33,8 +33,10 @@ public class ExameFormDialog extends JDialog {
         getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+        
         formPanel.add(new JLabel("Paciente:"));
         pacienteComboBox = new JComboBox<>();
+        pacienteComboBox.setToolTipText("Selecione o paciente para este exame"); 
         formPanel.add(pacienteComboBox);
 
         formPanel.add(new JLabel("Data (DD/MM/AAAA):"));
@@ -45,26 +47,31 @@ public class ExameFormDialog extends JDialog {
         } catch (ParseException e) {
             dataField = new JFormattedTextField();
         }
+        dataField.setToolTipText("Digite a data em que o exame foi realizado"); 
         formPanel.add(dataField);
 
         formPanel.add(new JLabel("Descrição:"));
         descricaoField = new JTextField();
+        descricaoField.setToolTipText("Digite a descrição do exame (ex: Hemograma, Raio-X)"); 
         formPanel.add(descricaoField);
         add(formPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnSalvar = new JButton(exame == null ? "Salvar" : "Atualizar");
+        btnSalvar.setToolTipText("Salvar os dados do exame");
+        
         JButton btnSair = new JButton("Sair");
+        btnSair.setToolTipText("Fechar este formulário sem salvar");
 
         buttonPanel.add(btnSalvar);
         if (exame == null) {
             JButton btnLimpar = new JButton("Limpar");
+            btnLimpar.setToolTipText("Limpar os campos para um novo cadastro");
             buttonPanel.add(btnLimpar);
             btnLimpar.addActionListener(e -> limparCampos());
         }
         buttonPanel.add(btnSair);
         add(buttonPanel, BorderLayout.SOUTH);
-
 
         btnSalvar.addActionListener(e -> controller.salvar());
         btnSair.addActionListener(e -> dispose());
@@ -75,7 +82,6 @@ public class ExameFormDialog extends JDialog {
             preencherCampos(exame);
         }
     }
-
 
     public void setPacientesNoComboBox(List<Paciente> pacientes) {
         pacienteComboBox.removeAllItems();
@@ -95,10 +101,8 @@ public class ExameFormDialog extends JDialog {
     public String getDescricao() {
         return descricaoField.getText();
     }
-
     
     private void preencherCampos(Exame exame) {
-       
         for (int i = 0; i < pacienteComboBox.getItemCount(); i++) {
             if (pacienteComboBox.getItemAt(i).getId().equals(exame.getPaciente().getId())) {
                 pacienteComboBox.setSelectedIndex(i);

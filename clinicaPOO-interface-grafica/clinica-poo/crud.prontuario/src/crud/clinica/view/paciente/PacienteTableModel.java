@@ -8,7 +8,11 @@ import java.util.List;
 
 public class PacienteTableModel extends AbstractTableModel {
 
-    private final String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Qtd. Exames"};
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final String[] colunas = {"ID", "Nome", "CPF", "Data de Nascimento", "Qtd. Exames"};
     private List<Paciente> pacientes;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
